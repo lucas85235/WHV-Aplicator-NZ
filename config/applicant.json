@@ -1,0 +1,158 @@
+{
+  "_README": "TODOS os dados do formulario WHV 462, pagina a pagina (ver PLANO.md secao 5). Preencha com dados REAIS e verdadeiros. yes/no = resposta dos radios. Datas no formato 'DD Mon YYYY' (ex: '18 Oct 2000'). Campos com null = preencher.",
+
+  "page02_context": {
+    "currentLocation": "Brazil",
+    "legalStatus": "Citizen",
+    "nonCitizenReasonAndVisaEnd": null,
+    "applicationType": "First Work and Holiday Visa (subclass 462)",
+    "grantedEnteredWHV462Before": "no",
+    "accompaniedByDependentChildren": "no",
+    "grantedEnteredWHV417Before": "no",
+    "proposedArrivalDate": "19 Dec 2026",
+    "fromCountryRequiringRegistration": "no",
+    "hasLetterOfGovernmentSupport": "no"
+  },
+
+  "page03_passport": {
+    "familyName": "De Souza Lima",
+    "givenNames": "Lucas",
+    "sex": "male",
+    "dateOfBirth": "08 May 2000",
+    "passportNumber": "GI914400",
+    "countryOfPassport": "Brazil",
+    "nationalityOfPassportHolder": "Brazil",
+    "dateOfIssue": "01 Mar 2024",
+    "dateOfExpiry": "28 Feb 2034",
+    "placeOfIssue": "SR/PF/AM",
+
+    "hasNationalIdentityCard": "yes",
+    "nationalIdentityCard": {
+      "familyName": "De Souza Lima",
+      "givenNames": "Lucas",
+      "identificationNumber": "29262402",
+      "countryOfIssue": "Brazil",
+      "dateOfIssue": "31 Oct 2025",
+      "dateOfExpiry": "29 Oct 2035"
+    },
+
+    "placeOfBirth": {
+      "city": "Manaus",
+      "state": "Amazonas",
+      "country": "Brazil"
+    },
+    "relationshipStatus": "Never married",
+    "knownByOtherName": "no",
+    "otherNames": null,
+    "citizenOfCountryOfPassport": "yes",
+    "citizenOfOtherCountry": "no",
+    "otherCitizenshipCountries": [],
+    "otherIdentityDocsNonAustralian": "no",
+    "otherIdentityDocs": [],
+    "healthExamsForAuVisaLast12Months": "no",
+    "hapId": null,
+    "hasOtherPassports": "no",
+    "otherPassports": [],
+    "confirmDataCorrect": "yes"
+  },
+
+  "page05_travel_history": {
+    "traveledOrAppliedAuVisaBefore": "no",
+    "previousAuVisa": {
+      "passportUsed": null,
+      "grantNumber": null
+    }
+  },
+
+  "page06_australia_history": {
+    "_note": "So aparece se houver vaga (passou do gate). Detalhar so se respostas exigirem.",
+    "answers": {}
+  },
+
+  "page07_contact": {
+    "usualCountryOfResidence": "Brazil",
+    "interviewLocationEmbassy": "Brazil, Brasilia",
+    "residentialAddress": {
+      "country": "Brazil",
+      "address": "R. Atagamita, 190 Aleixo",
+      "city": "Manaus",
+      "state": "Amazonas",
+      "postcode": "69060050"
+    },
+    "postalSameAsResidential": "yes",
+    "postalAddress": null,
+    "homePhone": "5592994822837",
+    "cellPhone": "5592994822837",
+    "email": "lucas85235@gmail.com"
+  },
+
+  "page08_correspondence": {
+    "_note": "CALIBRADO: 1 radio unico 'authorise another person to receive correspondence' (No / Yes,migration agent / Yes,legal / Yes,another). Solo = No. Revela campo 'Email address' (electronic communication) mesmo com No.",
+    "authorizeOtherToReceive": "no",
+    "correspondenceEmail": "lucas85235@gmail.com"
+  },
+
+  "page10_education": {
+    "meetsEducationRequirements": "yes",
+    "qualification": "Associate Degree",
+    "courseName": "Systems Analysis and Development",
+    "institutionName": "Universidade Estacio de Sa",
+    "institutionCountry": "Brazil",
+    "startDate": "02 May 2018",
+    "endDate": "15 Jul 2020",
+    "status": "Graduated"
+  },
+
+  "page11_occupation": {
+    "usualOccupationInBrazil": "Software Engineer",
+    "intendedFieldInAustralia": "Accommodation and Food Services"
+  },
+
+  "page12_english": {
+    "holdsPassportFromNativeEnglishCountry": "no",
+    "hasFunctionalEnglish": "yes",
+    "proofMethod": "Completion of an English Language proficiency test of at least functional level within the last 12 months",
+    "test": {
+      "nameOfTest": null,
+      "dateOfTest": null,
+      "testReferenceNumber": null,
+      "countryWhereUndertaken": null,
+      "languageAbility": null
+    },
+    "proofOtherText": "A TOEFL iBT English test is booked for 8 August 2026 (registration 4684808263266060); the certificate will be provided to the Department as soon as the result is available.",
+    "_proofLenNote": "LIMITE de servidor na caixa 'Give details': ~217 chars OK, 412 dava 'An error has occurred' (HTML maxlength=-1 esconde o limite). MANTENHA curto (<=~220). Texto atual ~170.",
+    "_proofNote": "Se 'test.nameOfTest' estiver preenchido (apos 08/08/2026, resultado TOEFL em maos), o bot marca a opcao TESTE e preenche os dados. Enquanto vazio, marca 'Other' + 'proofOtherText' (TOEFL agendado - VERDADE).",
+    "firstLanguage": "Portuguese"
+  },
+
+  "page14_health": {
+    "_note": "Responder com honestidade. Passaporte BR sempre gera exames (pais de risco TB), independente da Q1.",
+    "q1_outsidePassportCountryOver3MonthsLast5y": "no",
+    "q1_countries": [],
+    "q2_intendHospitalOrCareFacility": "no",
+    "q3_workStudyTrainHealthProfessional": "no",
+    "q4_workStudyTrainAgedOrDisabilityCare": "no",
+    "q5_workInternChildcare": "no",
+    "q6_classroomOver3Months": "no",
+    "q7_tuberculosisHistory": "no",
+    "q8_expectedMedicalCosts": "no",
+    "q9_mobilityOrCareAssistance": "no"
+  },
+
+  "page15_character": {
+    "_note": "18 perguntas. Responder com honestidade. Default no.",
+    "q1": "no", "q2": "no", "q3": "no", "q4": "no", "q5": "no", "q6": "no",
+    "q7": "no", "q8": "no", "q9": "no", "q10": "no", "q11": "no", "q12": "no",
+    "q13": "no", "q14": "no", "q15": "no", "q16": "no", "q17": "no", "q18": "no"
+  },
+
+  "page16_declarations": {
+    "_note": "Concordar com as 5 declaracoes (condicoes do visto, fundos, trabalho secundario).",
+    "agreeAll": true
+  },
+
+  "page17_declarations_final": {
+    "_note": "Concordar com as 14 declaracoes finais + declaracao de valores australianos.",
+    "agreeAll": true
+  }
+}

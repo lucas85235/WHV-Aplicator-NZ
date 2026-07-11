@@ -1,0 +1,51 @@
+{
+  "_README": "Flags de execucao. cdp.* = endpoint do Chrome aberto com --remote-debugging-port. gateRetry = loop quando trava no gate de vaga (intervalo CONSERVADOR para nao parecer DoS).",
+  "browser": {
+    "mode": "attach-cdp",
+    "cdp": {
+      "host": "127.0.0.1",
+      "port": 9222
+    },
+    "launchFallback": {
+      "channel": "chrome",
+      "headless": false,
+      "userDataDir": "./chrome-profile"
+    }
+  },
+  "timeouts": {
+    "defaultMs": 6000,
+    "navigationMs": 30000
+  },
+  "gateRetry": {
+    "enabled": true,
+    "intervalMs": 500,
+    "maxMinutes": 600,
+    "_note": "intervalMs = pausa entre tentativas (500ms; cada ciclo ~1.8s). 0 = maximo agressivo (~1.3s/ciclo, mas martela mais). maxMinutes = quanto tempo insiste (600 = 10h)."
+  },
+  "payment": {
+    "autofillCard": true,
+    "stopBeforePay": true,
+    "alarm": true,
+    "_note": "stopBeforePay=true: bot preenche cartao mas NAO clica Pagar ate o usuario confirmar. alarm=true: toca alarme alto ao chegar no pagamento p/ te acordar (OTP do banco e sempre manual)."
+  },
+  "flow": {
+    "startMode": "resume",
+    "_startModeNote": "resume = abre a aplicacao ja salva (pre-salvar 2-5 hoje). new = cria do zero (seleciona visto 462).",
+    "onError": "skip",
+    "_onErrorNote": "skip = best-effort, nunca trava (loga+screenshot+segue). pause = para e apita pra voce assumir o campo.",
+    "screenshotEachPage": true,
+    "fillOnlyEmpty": true,
+    "_fillOnlyEmptyNote": "true = nao sobrescreve campos ja preenchidos (protege a app pre-salva; pula paginas 2-5 e preenche as vazias 6-17)."
+  },
+  "monitor": {
+    "statusUrl": null,
+    "pollIntervalMs": 30000,
+    "autoStartLive": false,
+    "alertSound": true
+  },
+  "artifactsDir": "./artifacts",
+  "urls": {
+    "immiAccountLogin": "https://online.immi.gov.au/lusc/login",
+    "_note": "Confirmar URLs reais na calibracao."
+  }
+}

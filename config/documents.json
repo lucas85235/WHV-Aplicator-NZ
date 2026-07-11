@@ -1,0 +1,40 @@
+{
+  "_README": "5 documentos obrigatorios do 462. Formato <= 5MB; multipagina = 1 arquivo so. 'siteType' = nome exato do tipo no dropdown do ImmiAccount. 'path' = caminho do arquivo (barras normais funcionam no Windows). Docs nao-ingleses precisam de traducao anexada.",
+  "missingDocJustification": "A TOEFL iBT English test is booked for 8 August 2026 (registration 4684808263266060); the certificate will be provided to the Department as soon as the result is available.",
+  "_justNote": "Texto auto-preenchido na caixa de justificativa que o site abre quando falta um doc obrigatorio (no seu caso, o de ingles). VERDADE: TOEFL agendado 08/08/2026 em Manaus.",
+  "_siteTypeNote": "CALIBRADO no DOM real: a pagina 'Attach documents' tem 5 slots FIXOS (na ordem abaixo), cada um com dropdown 'Document Type' proprio + campo de arquivo. siteType = nome EXATO da opcao no dropdown daquele slot.",
+  "documents": [
+    {
+      "key": "travelDocument",
+      "siteType": "Passport",
+      "description": "Passport biographic page",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/travelDocument.jpg"
+    },
+    {
+      "key": "photo",
+      "siteType": "Photograph - digital",
+      "description": "Passport size photo 45x35mm, face and shoulders, neutral background",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/Photograph.png"
+    },
+    {
+      "key": "funds",
+      "siteType": "Bank Statement - Personal",
+      "description": "Wise account statement (English) - evidence of funds",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/wise.pdf"
+    },
+    {
+      "key": "english",
+      "siteType": "Other English Language Test Document",
+      "description": "TOEFL iBT test result (booked 8 Aug 2026)",
+      "path": null,
+      "_note": "PENDENTE ate 08/08/2026: TOEFL agendado, sem resultado ainda. Slot 4 fica vazio -> justificar (missingDocJustification). Quando sair o resultado: por o PDF no 'path' e preencher page12_english.test no applicant.json. siteType 'Other English Language Test Document' pois TOEFL nao e IELTS/OET."
+    },
+    {
+      "key": "qualifications",
+      "siteType": "Educational Certificate (Degree, Diploma etc)",
+      "description": "Diploma (Technologist, Systems Analysis and Development, Estacio 2020): original PT front+back plus sworn (juramentada) English translation, single PDF",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/diploma-original-traducao.pdf",
+      "_note": "COMPLETO num PDF so (5 pags): p1 frente PT, p2 verso PT (registro 25247/selo), p3-4 traducao juramentada (Neli Raquel Borba JUCESP 1.494), p5 log Clicksign. Original + traducao batem (verso traduzido)."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+# deps
+node_modules/
+dist/
+
+# artifacts: traces, screenshots, logs
+artifacts/
+*.log
+
+# SEGREDOS — nunca commitar dados de cartao / pessoais sensiveis
+config/secrets.local.json
+config/*.local.json
+
+# Documentos pessoais (passaporte, foto, extrato, diploma)
+assets/
+
+# QR / seed do 2FA (NUNCA commitar)
+qrcode.jpg
+*qrcode*
+*.2fa
+.env
+.env.*
+
+# Chrome profile usado para attach (se versionado por engano)
+chrome-profile/
+
+# SO
+Thumbs.db
+.DS_Store

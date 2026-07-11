@@ -1,0 +1,36 @@
+{
+  "name": "whv-aplicator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bot de aplicacao automatizada para o WHV 462 (ImmiAccount).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "login": "tsc && node dist/src/index.js login",
+    "rehearsal": "tsc && node dist/src/index.js rehearsal",
+    "live": "tsc && node dist/src/index.js live",
+    "monitor": "tsc && node dist/src/index.js monitor",
+    "prepare:app": "tsc && node dist/src/index.js prepare",
+    "chrome": "node dist/src/index.js chrome",
+    "open": "powershell -ExecutionPolicy Bypass -File scripts/open-chrome.ps1",
+    "watchdog": "powershell -ExecutionPolicy Bypass -File scripts/watchdog.ps1",
+    "codegen": "playwright codegen",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "node-notifier": "^10.0.1",
+    "otplib": "^12.0.1",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "playwright": "^1.50.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/node-notifier": "^8.0.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

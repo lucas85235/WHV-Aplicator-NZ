@@ -1,0 +1,28 @@
+{
+  "_README": "Seletores por pagina. Estrategia: PRIMARIO = label/texto (resolvido em runtime por locators.ts, nao precisa estar aqui). Este arquivo guarda OVERRIDES/FALLBACKS estaveis (css/role/id) capturados na CALIBRACAO via `npm run codegen`. Deixe {} ate calibrar; o bot tenta label primeiro e so usa o override se existir.",
+  "common": {
+    "nextButton": null,
+    "submitNowButton": null,
+    "newApplicationButton": null,
+    "editSavedApplicationButton": null,
+    "gateNoVacancyText": "no places",
+    "_gateNote": "gateNoVacancyText = trecho do aviso de indisponibilidade. Confirmar texto exato na calibracao."
+  },
+  "pages": {
+    "page02_context": {},
+    "page03_passport": {},
+    "page05_travel_history": {},
+    "page06_australia_history": {},
+    "page07_contact": {},
+    "page08_correspondence": {},
+    "page10_education": {},
+    "page11_occupation": {},
+    "page12_english": {},
+    "page14_health": {},
+    "page15_character": {},
+    "page16_declarations": {},
+    "page17_declarations_final": {},
+    "documents": {},
+    "payment": {}
+  }
+}
