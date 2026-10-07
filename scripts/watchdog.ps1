@@ -1,14 +1,14 @@
-# Watchdog: mantem Chrome(debug) + 'npm run live' de pe a noite toda.
+# Watchdog: mantem Chrome(debug) + 'npm run live' de pe ate a cota abrir.
 # Reinicia o live se morrer OU travar (heartbeat velho). NAO reinicia se estiver
-# em estado humano (PAST-GATE/PAYMENT/PAID) - la voce esta no controle.
+# em estado humano (OPEN/IN-APPLICATION/PAYMENT/PAID/HANDOVER) - la voce esta no controle.
 # Uso: npm run watchdog   (ou powershell -ExecutionPolicy Bypass -File scripts\watchdog.ps1)
 $ErrorActionPreference = "Continue"
-$root = "C:\Users\lucas\Documents\Projects\WHV-Aplicator"
+$root = "C:\Users\lucas\Documents\Projects\WHV-Aplicator-NZ"
 $statusFile = Join-Path $root "artifacts\status.json"
 $liveLog = Join-Path $root "artifacts\live.log"
 $wdLog = Join-Path $root "artifacts\watchdog.log"
 $staleSec = 300
-$humanStates = @("PAST-GATE", "PAYMENT", "PAID")
+$humanStates = @("OPEN", "IN-APPLICATION", "PAYMENT", "PAID", "HANDOVER")
 
 New-Item -ItemType Directory -Force -Path (Join-Path $root "artifacts") | Out-Null
 function WLog($m) { $line = "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')  $m"; $line; Add-Content -Path $wdLog -Value $line }

@@ -1,40 +1,60 @@
 {
-  "_README": "5 documentos obrigatorios do 462. Formato <= 5MB; multipagina = 1 arquivo so. 'siteType' = nome exato do tipo no dropdown do ImmiAccount. 'path' = caminho do arquivo (barras normais funcionam no Windows). Docs nao-ingleses precisam de traducao anexada.",
-  "missingDocJustification": "A TOEFL iBT English test is booked for 8 August 2026 (registration 4684808263266060); the certificate will be provided to the Department as soon as the result is available.",
-  "_justNote": "Texto auto-preenchido na caixa de justificativa que o site abre quando falta um doc obrigatorio (no seu caso, o de ingles). VERDADE: TOEFL agendado 08/08/2026 em Manaus.",
-  "_siteTypeNote": "CALIBRADO no DOM real: a pagina 'Attach documents' tem 5 slots FIXOS (na ordem abaixo), cada um com dropdown 'Document Type' proprio + campo de arquivo. siteType = nome EXATO da opcao no dropdown daquele slot.",
+  "_README": "Documentos do WHV Nova Zelandia (esquema Brasil). O portal WHS normalmente NAO exige upload no ato da inscricao - o INZ pede depois, por email (raio-X, seguro, antecedentes). Mesmo assim: se a tela pedir arquivo, o bot anexa sozinho pelo campo 'match' (regex do campo de upload).",
+  "_status": "required=true significa 'preciso ter isso pronto antes de 08/10/2026', nao que o site pede upload na hora.",
   "documents": [
     {
-      "key": "travelDocument",
-      "siteType": "Passport",
-      "description": "Passport biographic page",
-      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/travelDocument.jpg"
-    },
-    {
-      "key": "photo",
-      "siteType": "Photograph - digital",
-      "description": "Passport size photo 45x35mm, face and shoulders, neutral background",
-      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/Photograph.png"
+      "key": "passport",
+      "required": true,
+      "match": "passport",
+      "description": "Pagina biografica do passaporte (valido ate 28/02/2034)",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator-NZ/assets/travelDocument.jpg"
     },
     {
       "key": "funds",
-      "siteType": "Bank Statement - Personal",
-      "description": "Wise account statement (English) - evidence of funds",
-      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/wise.pdf"
+      "required": true,
+      "match": "funds|bank|financial|statement",
+      "description": "Extrato em ingles provando NZD 4.200 (~R$ 14 mil) disponiveis",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator-NZ/assets/wise.pdf",
+      "_note": "CONFERIR O SALDO: o extrato precisa mostrar pelo menos NZD 4.200 em nome dele, em ingles. O Wise serve."
     },
     {
-      "key": "english",
-      "siteType": "Other English Language Test Document",
-      "description": "TOEFL iBT test result (booked 8 Aug 2026)",
+      "key": "insurance",
+      "required": false,
+      "match": "insurance",
+      "description": "Apolice de seguro medico + hospitalar cobrindo TODA a estadia",
       "path": null,
-      "_note": "PENDENTE ate 08/08/2026: TOEFL agendado, sem resultado ainda. Slot 4 fica vazio -> justificar (missingDocJustification). Quando sair o resultado: por o PDF no 'path' e preencher page12_english.test no applicant.json. siteType 'Other English Language Test Document' pois TOEFL nao e IELTS/OET."
+      "_note": "NAO precisa na submissao (o INZ lista o seguro em 'After you apply'). Pode ser pedido durante o processamento e/ou na chegada. O formulario tem a pergunta declaratoria - responder Yes obriga a ter antes de viajar. Escolher provedor agora, comprar quando pedirem ou antes de embarcar."
+    },
+    {
+      "key": "policeCertificate",
+      "required": false,
+      "match": "police|character|criminal",
+      "description": "Certidao de antecedentes criminais (Policia Federal) + traducao, valida < 6 meses na submissao",
+      "path": null,
+      "_note": "O INZ pede se achar necessario. Tirar perto da data (validade de 6 meses)."
+    },
+    {
+      "key": "chestXray",
+      "required": false,
+      "match": "x-?ray|chest|medical|health certificate",
+      "description": "Raio-X de torax por medico credenciado (eMedical) - Brasil e pais de risco de TB",
+      "path": null,
+      "_note": "Normalmente feito DEPOIS da inscricao, no prazo que o INZ der. Pesquisar o medico credenciado em Manaus antes."
+    },
+    {
+      "key": "photo",
+      "required": false,
+      "match": "photo|image",
+      "description": "Foto tipo passaporte",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator-NZ/assets/Photograph.png"
     },
     {
       "key": "qualifications",
-      "siteType": "Educational Certificate (Degree, Diploma etc)",
-      "description": "Diploma (Technologist, Systems Analysis and Development, Estacio 2020): original PT front+back plus sworn (juramentada) English translation, single PDF",
-      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator/assets/diploma-original-traducao.pdf",
-      "_note": "COMPLETO num PDF so (5 pags): p1 frente PT, p2 verso PT (registro 25247/selo), p3-4 traducao juramentada (Neli Raquel Borba JUCESP 1.494), p5 log Clicksign. Original + traducao batem (verso traduzido)."
+      "required": false,
+      "match": "qualification|diploma|degree|education|certificate",
+      "description": "Diploma (Tecnologo, Analise e Desenvolvimento de Sistemas) PT + traducao juramentada",
+      "path": "c:/Users/lucas/Documents/Projects/WHV-Aplicator-NZ/assets/diploma-original-traducao.pdf",
+      "_note": "O esquema Brasil ja exigiu ensino superior. A pagina oficial atual nao lista - manter pronto por seguranca."
     }
   ]
 }

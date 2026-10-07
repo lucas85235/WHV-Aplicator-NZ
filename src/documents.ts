@@ -1,117 +1,48 @@
 import { existsSync, statSync } from "node:fs";
-import type { Page } from "playwright";
-import type { AppConfig } from "./types.js";
-import { clickButton, selectDropdown, fillLabel } from "./locators.js";
-import { tryAction } from "./util.js";
+import type { AppConfig, AnswerRule, JsonRecord } from "./types.js";
 import { log } from "./log.js";
 
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 10 * 1024 * 1024;
 
-/** Valida que os documentos existem, no tamanho correto. */
+/**
+ * Confere os arquivos listados em config/documents.json.
+ * No esquema WHS o INZ costuma NAO pedir upload na hora da inscricao (pede
+ * depois, por email: raio-X, seguro, antecedentes). Mesmo assim deixamos tudo
+ * pronto: se a tela pedir arquivo, o bot anexa sozinho.
+ */
 export function validateDocuments(cfg: AppConfig): boolean {
   let ok = true;
   for (const d of cfg.documents.documents) {
     const key = String(d["key"] ?? "?");
     const path = (d["path"] as string | null) ?? null;
+    const required = d["required"] !== false;
     if (!path) {
-      log.warn({ key }, "documento sem 'path' (sera pulado / justificado)");
-      ok = false;
+      log[required ? "error" : "warn"]({ key }, "documento sem 'path'");
+      if (required) ok = false;
       continue;
     }
     if (!existsSync(path)) {
-      log.error({ key, path }, "arquivo nao encontrado");
-      ok = false;
+      log[required ? "error" : "warn"]({ key, path }, "arquivo nao encontrado");
+      if (required) ok = false;
       continue;
     }
+    const mb = (statSync(path).size / 1024 / 1024).toFixed(1);
     if (statSync(path).size > MAX_BYTES) {
-      log.error({ key, path }, "arquivo > 5MB");
-      ok = false;
-      continue;
+      log.warn({ key, path, mb }, "arquivo grande (>10MB) - o portal pode recusar");
     }
-    log.info({ key, path }, "documento OK");
+    log.info({ key, path, mb }, "documento OK");
   }
   return ok;
 }
 
-/** Preenche a caixa de justificativa que o site abre quando falta um doc
- * obrigatorio (ex: certificado de ingles). Retorna true se preencheu algo. */
-export async function fillMissingDocJustification(page: Page, cfg: AppConfig): Promise<boolean> {
-  const text = (cfg.documents as Record<string, unknown>)["missingDocJustification"] as string | undefined;
-  if (!text) return false;
-  const areas = page.locator("textarea");
-  const n = await areas.count();
-  let filled = 0;
-  for (let i = 0; i < n; i += 1) {
-    const a = areas.nth(i);
-    if (!(await a.isVisible().catch(() => false))) continue;
-    const cur = await a.inputValue().catch(() => "");
-    if (!cur || cur.trim() === "") {
-      await a.fill(text).catch(() => {});
-      filled += 1;
-    }
-  }
-  if (filled) log.info({ caixas: filled }, "justificativa de doc faltante preenchida");
-  return filled > 0;
-}
-
-/** Anexa os documentos na pagina "Attach documents". CALIBRADO no DOM real:
- * 5 slots FIXOS (na ordem do config), cada um com um dropdown "Document Type" +
- * um input[type=file]. Pareia por indice (slot i <-> documents[i]). Seleciona o
- * tipo (siteType) e sobe o arquivo. Slot sem arquivo (ingles) fica p/ justificar. */
-export async function ensureDocumentsAttached(page: Page, cfg: AppConfig): Promise<void> {
-  const onErr = cfg.runtime.flow.onError;
-  const docs = cfg.documents.documents;
-  // revela todos os slots
-  await clickButton(page, "Expand all").catch(() => {});
-  await page.waitForTimeout(1000);
-  const typeSelects = page.getByLabel("Document Type", { exact: false });
-  const fileInputs = page.locator("input[type=file]");
-  const nSel = await typeSelects.count();
-  const nFile = await fileInputs.count();
-  log.info({ selects: nSel, files: nFile, docs: docs.length }, "attach documents: slots encontrados");
-
-  for (let i = 0; i < docs.length; i += 1) {
-    const d = docs[i] as Record<string, unknown>;
-    const key = String(d["key"] ?? `slot${i}`);
+/** Vira regras de upload pro livro de respostas (campos input[type=file]). */
+export function fileRules(docs: Array<JsonRecord>): AnswerRule[] {
+  const out: AnswerRule[] = [];
+  for (const d of docs) {
     const path = (d["path"] as string | null) ?? null;
-    const siteType = (d["siteType"] as string) ?? "";
-    if (!path || !existsSync(path)) {
-      log.warn({ key }, "sem arquivo — slot fica vazio (justificar depois)");
-      continue;
-    }
-    if (i >= nFile) {
-      log.warn({ key, i, nFile }, "slot alem dos file inputs disponiveis — pular");
-      continue;
-    }
-    await tryAction(
-      `anexar ${key} (slot ${i}: ${siteType})`,
-      async () => {
-        // 1) seleciona o Document Type no dropdown do slot i (nao usa .first())
-        const sel = typeSelects.nth(i);
-        if (await sel.count()) {
-          const opt = await sel.evaluate((el, want) => {
-            const W = String(want).replace(/\s+/g, " ").trim().toUpperCase();
-            const opts = [...(el as HTMLSelectElement).options].map((o) => o.text.replace(/\s+/g, " ").trim());
-            return (
-              opts.find((t) => t.toUpperCase() === W) ||
-              opts.find((t) => t.toUpperCase().includes(W)) ||
-              // fallback: 1a opcao real (nao placeholder / nao "Other")
-              opts.find((t) => t && !/^please select|^-+$|^other\b/i.test(t)) ||
-              null
-            );
-          }, siteType);
-          if (opt) await sel.selectOption({ label: opt }, { timeout: 4000 }).catch(() => {});
-          await page.waitForTimeout(600); // postback do dropdown
-        }
-        // 2) Description do slot i (opcional, mas preenche por seguranca)
-        const descInput = page.getByLabel("Description", { exact: false }).nth(i);
-        if (await descInput.count()) await descInput.fill(String(d["description"] ?? "")).catch(() => {});
-        // 3) escolhe o arquivo no input do slot i (upload real acontece no Next)
-        await fileInputs.nth(i).setInputFiles(path, { timeout: 8000 });
-        await page.waitForTimeout(800); // upload/postback
-      },
-      onErr,
-    );
+    const match = (d["match"] as string | null) ?? null;
+    if (!path || !match || !existsSync(path)) continue;
+    out.push({ id: `doc:${String(d["key"] ?? "?")}`, match, kind: "file", value: path });
   }
-  await page.waitForTimeout(1200);
+  return out;
 }

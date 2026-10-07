@@ -26,3 +26,6 @@ chrome-profile/
 # SO
 Thumbs.db
 .DS_Store
+
+# artefatos do projeto australiano antigo
+artifacts-au/

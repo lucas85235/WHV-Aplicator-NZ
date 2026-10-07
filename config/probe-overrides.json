@@ -1,0 +1,35 @@
+{
+  "_README": "SO usado por `npm run probe`. Regras aplicadas EM MEMORIA, na frente do answers.json, pra simular um passaporte peruano e passar da elegibilidade. O answers.json real nao e alterado. NUNCA usado por live/rehearsal.",
+  "_aviso": "Rascunho com esses dados fica salvo no INZ. APAGUE o rascunho depois do teste - a mesma conta vai aplicar pro Brasil em 07/10.",
+  "rules": [
+    {
+      "id": "probe-cidadao-peru",
+      "match": "citizen of (the republic of )?peru|peruvian (citizen|national)|hold a (current )?peru",
+      "value": "Yes"
+    },
+    {
+      "id": "probe-passaporte-numero",
+      "match": "passport.{0,15}number|number.{0,10}passport",
+      "value": "118402736",
+      "_note": "Sintetico, formato do passaporte biometrico peruano (9 digitos). Nao e de ninguem conhecido - so pra passar validacao de formato."
+    },
+    {
+      "id": "probe-local-emissao",
+      "match": "place of issue|issued at|issuing (authority|office)",
+      "not": "identity|licence|card",
+      "value": "LIMA"
+    },
+    {
+      "id": "probe-passaporte-pais",
+      "match": "passport.{0,25}(country|issued|nationality)|country.{0,15}passport|issuing country",
+      "not": "birth|residen",
+      "value": "Peru"
+    },
+    {
+      "id": "probe-nacionalidade",
+      "match": "nationality|citizenship|country of citizenship",
+      "not": "birth|residen|dual|any other|another",
+      "value": "Peru"
+    }
+  ]
+}

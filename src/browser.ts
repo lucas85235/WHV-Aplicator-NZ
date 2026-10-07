@@ -3,6 +3,23 @@ import type { Browser, BrowserContext, Page } from "playwright";
 import type { RuntimeConfig } from "./types.js";
 import { log } from "./log.js";
 
+// Nunca bloquear: imagem de captcha/challenge do WAF. Se o INZ mandar um
+// desafio e a imagem nao carregar, o usuario nao consegue resolver na tela.
+const NUNCA_BLOQUEAR = /captcha|challenge|securit|verify|bot|logo/i;
+
+/** Corta bytes que nao mudam o formulario (fonte, video, imagem decorativa). */
+async function blockHeavyAssets(context: BrowserContext): Promise<void> {
+  await context.route("**/*", (route) => {
+    const req = route.request();
+    const t = req.resourceType();
+    if ((t === "font" || t === "media" || t === "image") && !NUNCA_BLOQUEAR.test(req.url())) {
+      return route.abort().catch(() => {});
+    }
+    return route.continue().catch(() => {});
+  });
+  log.info("assets pesados bloqueados (fonte/video/imagem nao-essencial)");
+}
+
 export interface Session {
   browser: Browser | null;
   context: BrowserContext;
@@ -23,6 +40,7 @@ export async function openSession(rt: RuntimeConfig): Promise<Session> {
     const page = context.pages()[0] ?? (await context.newPage());
     context.setDefaultTimeout(rt.timeouts.defaultMs);
     context.setDefaultNavigationTimeout(rt.timeouts.navigationMs);
+    if (rt.flow.blockHeavyAssets) await blockHeavyAssets(context);
     return {
       browser,
       context,
@@ -42,6 +60,7 @@ export async function openSession(rt: RuntimeConfig): Promise<Session> {
   const page = context.pages()[0] ?? (await context.newPage());
   context.setDefaultTimeout(rt.timeouts.defaultMs);
   context.setDefaultNavigationTimeout(rt.timeouts.navigationMs);
+  if (rt.flow.blockHeavyAssets) await blockHeavyAssets(context);
   return {
     browser: null,
     context,

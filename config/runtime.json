@@ -1,51 +1,53 @@
 {
-  "_README": "Flags de execucao. cdp.* = endpoint do Chrome aberto com --remote-debugging-port. gateRetry = loop quando trava no gate de vaga (intervalo CONSERVADOR para nao parecer DoS).",
+  "_README": "Flags de execucao. cdp.* = Chrome aberto com --remote-debugging-port. opening.* = espera pela abertura da cota do Brasil. Intervalos CONSERVADORES de proposito: o portal do INZ fica atras de WAF (F5) e rajada de request cai em captcha / derruba a sessao - perder a sessao custa MUITO mais que os segundos economizados.",
   "browser": {
     "mode": "attach-cdp",
-    "cdp": {
-      "host": "127.0.0.1",
-      "port": 9222
-    },
-    "launchFallback": {
-      "channel": "chrome",
-      "headless": false,
-      "userDataDir": "./chrome-profile"
-    }
+    "cdp": { "host": "127.0.0.1", "port": 9222 },
+    "launchFallback": { "channel": "chrome", "headless": false, "userDataDir": "./chrome-profile" }
   },
-  "timeouts": {
-    "defaultMs": 6000,
-    "navigationMs": 30000
-  },
-  "gateRetry": {
-    "enabled": true,
-    "intervalMs": 500,
-    "maxMinutes": 600,
-    "_note": "intervalMs = pausa entre tentativas (500ms; cada ciclo ~1.8s). 0 = maximo agressivo (~1.3s/ciclo, mas martela mais). maxMinutes = quanto tempo insiste (600 = 10h)."
+  "timeouts": { "defaultMs": 8000, "navigationMs": 30000 },
+  "opening": {
+    "isoUtc": "2026-10-07T21:00:00Z",
+    "_isoNote": "08 Out 2026 10:00 NZDT (UTC+13) = 07 Out 21:00 UTC = 17:00 em Manaus / 18:00 em Brasilia. CONFIRMAR na pagina oficial antes do dia.",
+    "leadSeconds": 900,
+    "_leadNote": "janela 'hot' comeca 15 min antes do horario oficial.",
+    "burstSeconds": 60,
+    "burstPollMs": 900,
+    "_burstNote": "rajada: de 60s antes ate ~4 min depois do horario, checa a cada 0,9s. Detecta a abertura em <1s em vez de ~2s de media. NAO descer de ~700ms.",
+    "idlePollMs": 300000,
+    "hotPollMs": 4000,
+    "jitterMs": 1500,
+    "maxMinutes": 240
   },
   "payment": {
     "autofillCard": true,
     "stopBeforePay": true,
     "alarm": true,
-    "_note": "stopBeforePay=true: bot preenche cartao mas NAO clica Pagar ate o usuario confirmar. alarm=true: toca alarme alto ao chegar no pagamento p/ te acordar (OTP do banco e sempre manual)."
+    "_note": "o bot preenche o cartao mas NUNCA clica em pagar. OTP/3-D Secure do banco e sempre manual."
   },
   "flow": {
-    "startMode": "resume",
-    "_startModeNote": "resume = abre a aplicacao ja salva (pre-salvar 2-5 hoje). new = cria do zero (seleciona visto 462).",
     "onError": "skip",
-    "_onErrorNote": "skip = best-effort, nunca trava (loga+screenshot+segue). pause = para e apita pra voce assumir o campo.",
-    "screenshotEachPage": true,
+    "fillMode": "fast",
+    "_fillModeNote": "fast = escreve a tela inteira num unico round-trip pelo CDP (~10ms) em vez de campo a campo (~30-60ms cada). 40 campos: ~0,05s vs ~2s. safe = campo a campo, use so se o fast der problema em alguma tela.",
+    "maxFillPasses": 3,
+    "_passesNote": "re-varre a tela depois de escrever, pra pegar campo que so aparece apos postback (ex: 'Yes' revela sub-pergunta). Para sozinho quando nao ha mais o que escrever.",
+    "settleMs": 900,
+    "navMaxMs": 15000,
+    "_esperaNote": "esperas ADAPTATIVAS: o bot observa uma assinatura barata da tela e segue no instante em que ela muda. Esses numeros sao TETO, nao espera fixa.",
+    "screenshotMode": "viewport",
+    "_screenshotNote": "off = mais rapido (o dump JSON do scan continua sendo salvo, entao ainda ha rastro). viewport = ~100ms. full = ~500ms por tela.",
+    "onUnanswered": "warn",
+    "_onUnansweredNote": "warn = loga e segue (rapido). pause = para e espera voce responder o campo na tela.",
     "fillOnlyEmpty": true,
-    "_fillOnlyEmptyNote": "true = nao sobrescreve campos ja preenchidos (protege a app pre-salva; pula paginas 2-5 e preenche as vazias 6-17)."
-  },
-  "monitor": {
-    "statusUrl": null,
-    "pollIntervalMs": 30000,
-    "autoStartLive": false,
-    "alertSound": true
+    "blockHeavyAssets": false,
+    "_blockNote": "true = bloqueia fonte/video/imagem decorativa (pagina abre mais rapido). Imagem de captcha/logo/challenge NUNCA e bloqueada. Testar no ensaio antes de ligar no dia D.",
+    "maxSteps": 40
   },
   "artifactsDir": "./artifacts",
   "urls": {
-    "immiAccountLogin": "https://online.immi.gov.au/lusc/login",
-    "_note": "Confirmar URLs reais na calibracao."
+    "whsLogin": "https://onlineservices.immigration.govt.nz/secure/Login+Working+Holiday.htm",
+    "schemeInfo": "https://www.immigration.govt.nz/visas/brazil-working-holiday-visa/",
+    "applyDirect": null,
+    "_applyDirectNote": "Se na calibracao voce descobrir a URL direta de 'nova aplicacao', cole aqui: o bot pula o carregamento do painel + o clique (economiza 1-2s no momento mais caro)."
   }
 }

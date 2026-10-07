@@ -30,8 +30,16 @@ async function classify(page: Page): Promise<Cls> {
   if (await loginPageVisible(page)) return "expired"; // sessao caiu -> foi pro login
   if (await textVisible(page, BROKEN)) return "broken";
   if (await textVisible(page, NO_VACANCY)) return "closed";
-  const h = (await page.locator("h1,h2,h3").allTextContents().catch(() => [])).join(" | ");
-  if (POST_GATE.test(h)) return "open"; // chegou na pagina 6 de verdade = passou
+  // SO headings VISIVEIS: paginas com erro (ex: pais que exige pre-registro, como China)
+  // podem ter legends OCULTAS de sub-secoes futuras (ex: "Previous travel to Australia")
+  // no mesmo DOM da pagina 3 -> allTextContents() pegaria isso e daria falso positivo.
+  const h = await page.evaluate((sel) => {
+    return [...document.querySelectorAll(sel)]
+      .filter((el) => (el as HTMLElement).offsetParent || el.getClientRects().length)
+      .map((el) => el.textContent || "")
+      .join(" | ");
+  }, "h1,h2,h3").catch(() => "");
+  if (POST_GATE.test(h)) return "open"; // chegou na pagina 6 de verdade = passou (heading VISIVEL)
   return "closed"; // confirmacao, transitorio ou desconhecido = ainda no gate, insiste
 }
 

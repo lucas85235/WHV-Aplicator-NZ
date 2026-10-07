@@ -3,8 +3,8 @@
 $ErrorActionPreference = "Stop"
 
 $port       = 9222
-$profileDir = "C:\Users\lucas\whv-chrome"
-$loginUrl   = "https://online.immi.gov.au/lusc/login"
+$profileDir = "C:\Users\lucas\whv-nz-chrome"
+$loginUrl   = "https://onlineservices.immigration.govt.nz/secure/Login+Working+Holiday.htm"
 
 # 1) achar o chrome.exe
 $candidates = @(
@@ -51,5 +51,5 @@ if (-not $ok) {
 }
 
 Write-Host ""
-Write-Host "AGORA faca LOGIN manual no ImmiAccount nesse Chrome." -ForegroundColor White
+Write-Host "AGORA faca LOGIN no portal WHS do INZ nesse Chrome." -ForegroundColor White
 Write-Host "Depois, em outra janela do terminal, rode:  npm run rehearsal" -ForegroundColor White

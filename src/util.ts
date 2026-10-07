@@ -17,12 +17,13 @@ export function writeStatus(dir: string, state: string, extra: Record<string, un
 
 let shotN = 0;
 
-export async function screenshot(page: Page, name: string, dir: string): Promise<void> {
+export async function screenshot(page: Page, name: string, dir: string, fullPage = false): Promise<void> {
   try {
     mkdirSync(dir, { recursive: true });
     shotN += 1;
     const file = resolve(dir, `${String(shotN).padStart(2, "0")}-${name}.png`);
-    await page.screenshot({ path: file, fullPage: true });
+    // fullPage forca re-layout da pagina inteira (~300-800ms). Viewport: ~60-150ms.
+    await page.screenshot({ path: file, fullPage });
     log.debug({ file }, "screenshot");
   } catch (e) {
     log.debug({ err: shortErr(e) }, "screenshot falhou");

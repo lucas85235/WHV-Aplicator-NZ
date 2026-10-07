@@ -1,24 +1,32 @@
 {
-  "name": "whv-aplicator",
+  "name": "whv-aplicator-nz",
   "version": "0.1.0",
   "private": true,
-  "description": "Bot de aplicacao automatizada para o WHV 462 (ImmiAccount).",
+  "description": "Bot de inscricao automatizada no Working Holiday Visa da Nova Zelandia (esquema Brasil, 300 vagas).",
   "type": "module",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "login": "tsc && node dist/src/index.js login",
     "rehearsal": "tsc && node dist/src/index.js rehearsal",
+    "scan": "tsc && node dist/src/index.js scan",
+    "watch": "tsc && node dist/src/index.js watch",
     "live": "tsc && node dist/src/index.js live",
-    "monitor": "tsc && node dist/src/index.js monitor",
-    "prepare:app": "tsc && node dist/src/index.js prepare",
+    "when": "tsc && node dist/src/index.js when",
+    "docs": "tsc && node dist/src/index.js docs",
     "chrome": "node dist/src/index.js chrome",
     "open": "powershell -ExecutionPolicy Bypass -File scripts/open-chrome.ps1",
     "watchdog": "powershell -ExecutionPolicy Bypass -File scripts/watchdog.ps1",
     "codegen": "playwright codegen",
-    "typecheck": "tsc --noEmit"
+    "notify-test": "tsc && node scripts/test-notify.mjs",
+    "selftest": "tsc && node scripts/selftest.mjs",
+    "secrets": "node scripts/set-login.mjs",
+    "probe": "tsc && node dist/src/index.js probe",
+    "assist": "tsc && node dist/src/index.js assist",
+    "assist-test": "tsc && node scripts/assist-test.mjs"
   },
   "dependencies": {
     "node-notifier": "^10.0.1",
