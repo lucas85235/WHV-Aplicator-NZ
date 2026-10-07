@@ -148,6 +148,9 @@ export function intervaloRefresh(cfg: AppConfig): number {
 export async function assist(cfg: AppConfig, opts: { entrada?: boolean } = {}): Promise<void> {
   const dir = cfg.runtime.artifactsDir;
   cfg.answers.defaults.checkDeclarations = false; // declaracao: voce marca, depois de revisar
+  // Nada de anexo automatico: o formulario real nao pede upload, e o wise.pdf e antigo.
+  // Se aparecer campo de arquivo, e seu.
+  cfg.answers.rules = cfg.answers.rules.filter((r) => r.kind !== "file");
   const autoAdvance = cfg.runtime.flow.autoAdvance !== false;
   // 07/10 tela real: botoes do wizard = Previous | SAVE | COMPLETE LATER | Next.
   // So "Next" avanca. "SAVE" recarrega a mesma aba (o bot ficou 8x em loop no WHS Specific).
