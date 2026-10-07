@@ -106,6 +106,8 @@ export interface AnswerRule {
   kind?: FieldKind;
   /** Valor a preencher / opcao a marcar. "@skip" = deixa pro humano. */
   value: string;
+  /** Sobrescreve mesmo se o campo ja tiver valor (ex: sobrenome pre-preenchido pela conta). */
+  force?: boolean;
 }
 
 export interface AnswerBook {

@@ -1,7 +1,6 @@
 {
   "_README": "Seus dados REAIS. O answers.json referencia estes campos como {{secao.campo}}. Datas: o portal do INZ usa DD/MM/YYYY - se na calibracao aparecer outro formato, mude aqui (o bot manda o texto como esta).",
   "_avisoVerdade": "Tudo aqui tem que ser VERDADE. Mentir em formulario de imigracao = recusa e banimento.",
-
   "personal": {
     "familyName": "De Souza Lima",
     "givenNames": "Lucas",
@@ -17,7 +16,6 @@
     "relationshipStatus": "Single",
     "knownByOtherNames": "No"
   },
-
   "passport": {
     "number": "GI914400",
     "country": "Brazil",
@@ -26,16 +24,14 @@
     "dateOfExpiry": "28/02/2034",
     "placeOfIssue": "SR/PF/AM"
   },
-
   "secondId": {
     "_note": "O formulario WHS pede uma 2a forma de identificacao (RG / CNH / certidao).",
-    "type": "National identity card",
+    "type": "National ID",
     "number": "29262402",
     "country": "Brazil",
     "dateOfIssue": "31/10/2025",
     "dateOfExpiry": "29/10/2035"
   },
-
   "contact": {
     "email": "lucas85235@gmail.com",
     "mobile": "+55 92 99482 2837",
@@ -46,16 +42,16 @@
     "city": "Manaus",
     "state": "Amazonas",
     "postcode": "69060050",
-    "country": "Brazil"
+    "country": "Brazil",
+    "streetNumber": "190",
+    "streetName": "Rua Atagamita"
   },
-
   "occupation": {
     "_note": "Opcional no formulario. Ocupacao ATUAL no Brasil.",
     "jobTitle": "Software Engineer",
     "industry": "Information Media and Telecommunications",
     "employer": ""
   },
-
   "trip": {
     "intendedArrivalDate": "15/01/2027",
     "_arrivalNote": "Data pretendida de chegada na NZ. O visto vale 12 meses e precisa ser ativado dentro do prazo de validade - escolha algo realista.",
@@ -66,7 +62,6 @@
     "hasReturnTicket": "No",
     "hasFundsForTicket": "Yes"
   },
-
   "insurance": {
     "_note": "Seguro medico obrigatorio como CONDICAO DO VISTO, nao como documento da inscricao. Nao precisa estar contratado em 07/10 - preencher aqui quando comprar.",
     "provider": "",
@@ -74,19 +69,16 @@
     "validFrom": "",
     "validTo": ""
   },
-
   "health": {
     "_note": "Brasil e pais de risco de tuberculose: o INZ costuma pedir raio-X de torax. Responder com honestidade.",
     "livedInTbCountry": "Yes",
     "tbCountry": "Brazil",
     "defaultAnswer": "No"
   },
-
   "character": {
     "_note": "Antecedentes / deportacao / condenacoes. Default No; responder com honestidade.",
     "defaultAnswer": "No"
   },
-
   "education": {
     "_note": "O esquema Brasil ja exigiu ensino superior completo/cursando. A pagina oficial atual nao lista - manter o diploma pronto por seguranca.",
     "qualification": "Associate Degree",
@@ -97,13 +89,11 @@
     "endDate": "15/07/2020",
     "status": "Completed"
   },
-
   "previousNz": {
     "hasBeenToNz": "No",
     "hasHadNzWorkingHolidayVisa": "No",
     "hasBeenRefusedVisa": "No"
   },
-
   "adviser": {
     "usingImmigrationAdviser": "No"
   }

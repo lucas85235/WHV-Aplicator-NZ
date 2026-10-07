@@ -5,7 +5,7 @@
 // Uso: npm run assist-test
 import { chromium } from "playwright";
 import { loadConfig } from "../dist/src/config.js";
-import { assist } from "../dist/src/runner.js";
+import { assist } from "../dist/src/assist.js";
 
 const BASE = "https://onlineservices.immigration.govt.nz";
 const opt = (xs) => xs.map((x) => `<option>${x}</option>`).join("");

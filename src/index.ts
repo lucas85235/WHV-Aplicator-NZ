@@ -1,5 +1,6 @@
 import { loadConfig } from "./config.js";
-import { rehearsal, live, watch, scan, probe, assist } from "./runner.js";
+import { rehearsal, live, watch, scan, probe } from "./runner.js";
+import { assist } from "./assist.js";
 import { validateDocuments } from "./documents.js";
 import { openSession } from "./browser.js";
 import { login } from "./nz/login.js";
@@ -81,7 +82,8 @@ async function main(): Promise<void> {
       await watch(cfg);
       break;
     case "assist":
-      await assist(cfg);
+      // entrada automatica (refresh + APPLY NOW do Brasil) ligada por padrao
+      await assist(cfg, { entrada: !process.argv.includes("--sem-entrada") });
       break;
     case "scan":
       await scan(cfg);

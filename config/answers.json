@@ -2,84 +2,373 @@
   "_README": "LIVRO DE RESPOSTAS. O bot varre a tela, monta uma chave de busca por campo ('pergunta | label | name | seletor') e usa a PRIMEIRA regra cujo 'match' (regex, case-insensitive) casar. Ordem = prioridade: especifico em cima, generico embaixo.",
   "_como_calibrar": "Rode `npm run scan` com a tela aberta: sai artifacts/scan-*.json com a chaveDeBusca de cada campo e qual regra casou (regra: null = campo sem resposta). Ajuste os 'match' daqui com base nisso.",
   "_valores": "value pode usar {{secao.campo}} do applicant.json. '@skip' = nao mexe, deixa pro humano.",
-
   "defaults": {
     "yesNo": "No",
     "_yesNoNote": "resposta dos Yes/No que NENHUMA regra casou (as dezenas de perguntas de saude e carater). As que precisam ser 'Yes' estao com regra explicita abaixo. CONFIRA o scan antes do dia D.",
     "checkDeclarations": true
   },
-
   "rules": [
-    { "id": "skip-senha", "match": "password|senha|captcha|security question|secret answer", "value": "@skip" },
-    { "id": "skip-explicacao", "match": "explain|give details|provide details|if you answered yes", "kind": "textarea", "value": "@skip" },
-
-    { "id": "sobrenome", "match": "family name|surname|last name", "value": "{{personal.familyName}}" },
-    { "id": "nome-2", "match": "given name.?2|second given name|middle name", "value": "{{personal.givenName2}}" },
-    { "id": "nome-3", "match": "given name.?3|third given name", "value": "{{personal.givenName3}}" },
-    { "id": "nome", "match": "given name|first name|forename", "value": "{{personal.givenNames}}" },
-    { "id": "nome-preferido", "match": "preferred name|known as", "value": "{{personal.preferredName}}" },
-    { "id": "outros-nomes", "match": "other name|name change|changed your name|previously known", "value": "{{personal.knownByOtherNames}}" },
-
-    { "id": "sexo", "match": "\\bsex\\b|gender", "value": "{{personal.sex}}" },
-    { "id": "nascimento-data", "match": "date of birth|birth date|\\bdob\\b", "value": "{{personal.dateOfBirth}}" },
-    { "id": "nascimento-cidade", "match": "(town|city|place).{0,20}birth|birth.{0,20}(town|city|place)", "value": "{{personal.cityOfBirth}}" },
-    { "id": "nascimento-pais", "match": "country of birth|birth.{0,10}country", "value": "{{personal.countryOfBirth}}" },
-    { "id": "estado-civil", "match": "relationship status|marital status", "value": "{{personal.relationshipStatus}}" },
-
-    { "id": "passaporte-numero", "match": "passport.{0,15}number|number.{0,10}passport", "value": "{{passport.number}}" },
-    { "id": "passaporte-pais", "match": "passport.{0,25}(country|issued in)|country.{0,15}passport|issuing country", "value": "{{passport.country}}" },
-    { "id": "passaporte-nacionalidade", "match": "nationality.{0,25}passport|passport.{0,25}nationality", "value": "{{passport.nationality}}" },
-    { "id": "passaporte-emissao", "match": "passport.{0,25}(date of )?issue|issue date", "not": "identity|licence|license|card", "value": "{{passport.dateOfIssue}}" },
-    { "id": "passaporte-validade", "match": "passport.{0,25}expir|expiry date|date of expiry", "not": "identity|licence|license|card|visa expir", "value": "{{passport.dateOfExpiry}}" },
-    { "id": "passaporte-local", "match": "place of issue|issued at", "not": "identity|licence|card", "value": "{{passport.placeOfIssue}}" },
-
-    { "id": "id2-tipo", "match": "(second|another|other).{0,20}(form of )?(id|identification|identity)|type of identification", "kind": "select", "value": "{{secondId.type}}" },
-    { "id": "id2-numero", "match": "(identity|identification|national id|id document).{0,20}number", "value": "{{secondId.number}}" },
-    { "id": "id2-pais", "match": "(identity|identification|id document).{0,25}country", "value": "{{secondId.country}}" },
-    { "id": "id2-emissao", "match": "(identity|identification|id document).{0,25}issue", "value": "{{secondId.dateOfIssue}}" },
-    { "id": "id2-validade", "match": "(identity|identification|id document).{0,25}expir", "value": "{{secondId.dateOfExpiry}}" },
-
-    { "id": "nacionalidade", "match": "nationality|citizen of|citizenship", "not": "dual|another country|any other", "value": "{{personal.nationality}}" },
-    { "id": "cidadao-outro-pais", "match": "citizen of any other|dual citizen|another citizenship", "value": "No" },
-
-    { "id": "email", "match": "e-?mail", "value": "{{contact.email}}" },
-    { "id": "celular", "match": "mobile|cell ?phone", "value": "{{contact.mobile}}" },
-    { "id": "telefone", "match": "phone|telephone|contact number", "value": "{{contact.phone}}" },
-
-    { "id": "endereco-1", "match": "address line ?1|street address|^address$|residential address", "not": "email|country|city|postcode|post code", "value": "{{contact.addressLine1}}" },
-    { "id": "endereco-2", "match": "address line ?2", "value": "{{contact.addressLine2}}" },
-    { "id": "bairro", "match": "suburb", "value": "{{contact.suburb}}" },
-    { "id": "cidade", "match": "\\bcity\\b|town", "not": "birth", "value": "{{contact.city}}" },
-    { "id": "estado", "match": "\\bstate\\b|province|region", "not": "united states|statement", "value": "{{contact.state}}" },
-    { "id": "cep", "match": "post ?code|zip", "value": "{{contact.postcode}}" },
-    { "id": "pais-residencia", "match": "country", "not": "birth|passport|identity|citizen|institution|new zealand|deport|removed|convicted|refused|excluded", "value": "{{contact.country}}" },
-
-    { "id": "ocupacao-cargo", "match": "occupation|job title|position", "not": "industry|intend", "value": "{{occupation.jobTitle}}" },
-    { "id": "ocupacao-industria", "match": "industry|sector|field of work", "kind": "select", "value": "{{occupation.industry}}" },
-
-    { "id": "chegada", "match": "intend.{0,30}(arriv|travel|enter)|arrival date|date of arrival|when.{0,20}travel to new zealand", "value": "{{trip.intendedArrivalDate}}" },
-    { "id": "fundos-valor", "match": "amount of (funds|money)|how much (money|funds)", "value": "{{trip.fundsNZD}}" },
-    { "id": "fundos-tem", "match": "4,?200|sufficient (funds|money)|enough (funds|money)|access to funds|maintenance funds", "value": "Yes" },
-    { "id": "seguro", "match": "insurance", "value": "Yes" },
-    { "id": "passagem", "match": "onward|return ticket|ticket out of new zealand|leave new zealand|funds to (buy|purchase)", "value": "Yes" },
-    { "id": "passaporte-valido-3m", "match": "passport.{0,40}valid", "value": "Yes" },
-
-    { "id": "consultor", "match": "immigration adviser|licensed adviser|agent acting", "value": "{{adviser.usingImmigrationAdviser}}" },
-    { "id": "paga-cartao", "match": "pay.{0,25}(credit|debit) card|payment method|paying online", "value": "Yes" },
-
-    { "id": "whv-anterior", "match": "working holiday.{0,40}(before|previously|granted)|previously.{0,25}working holiday", "value": "{{previousNz.hasHadNzWorkingHolidayVisa}}" },
-    { "id": "esteve-nz", "match": "been to new zealand|travelled to new zealand|held a (new zealand )?visa", "value": "{{previousNz.hasBeenToNz}}" },
-    { "id": "visto-recusado", "match": "refused|declined|deported|removed from", "value": "{{previousNz.hasBeenRefusedVisa}}" },
-
-    { "id": "tuberculose-diagnostico", "match": "(had|have|diagnosed with|treatment for|suffered from).{0,25}(tuberculosis|\\btb\\b)|(tuberculosis|\\btb\\b).{0,25}(diagnos|treatment)", "value": "No", "_note": "VERDADE: nunca teve TB. NAO confundir com a pergunta de ter morado em pais de risco." },
-    { "id": "tuberculose-residencia", "match": "(spent|lived|resided|stayed).{0,60}(tuberculosis|\\btb\\b)|countries where (tuberculosis|\\btb\\b)|(tuberculosis|\\btb\\b) is common", "value": "Yes", "_note": "VERDADE: mora no Brasil, que esta na lista de risco de TB do INZ." },
-    { "id": "tuberculose-pais", "match": "which countr|countries.{0,30}(lived|spent|stayed)", "value": "{{health.tbCountry}}" },
-
-    { "id": "intencao-genuina", "match": "genuine|main purpose|primarily.{0,20}(holiday|travel)|intend to (leave|comply|abide)", "value": "Yes" },
-    { "id": "declaracao", "match": "declar|i agree|i confirm|read and underst|terms and conditions|privacy", "value": "Yes" },
-
-    { "id": "educacao-qualificacao", "match": "qualification", "kind": "select", "value": "{{education.qualification}}" },
-    { "id": "educacao-curso", "match": "course name|programme|study name", "value": "{{education.courseName}}" },
-    { "id": "educacao-instituicao", "match": "institution|university|school name", "value": "{{education.institutionName}}" }
+    {
+      "id": "skip-senha",
+      "match": "password|senha|captcha|security question|secret answer",
+      "value": "@skip"
+    },
+    {
+      "id": "skip-explicacao",
+      "match": "explain|give details|provide details|if you answered yes",
+      "kind": "textarea",
+      "value": "@skip"
+    },
+    {
+      "id": "outros-nomes-texto",
+      "match": "other names you are or have ever been known",
+      "kind": "text",
+      "value": "@skip",
+      "_note": "07/10: e campo de TEXTO pra listar nomes - vazio. Nao escrever 'No'."
+    },
+    {
+      "id": "titulo",
+      "match": "preferred title",
+      "value": "Mr"
+    },
+    {
+      "id": "rua-numero",
+      "match": "street number",
+      "value": "{{contact.streetNumber}}"
+    },
+    {
+      "id": "rua-nome",
+      "match": "street name",
+      "value": "{{contact.streetName}}"
+    },
+    {
+      "id": "comunicacao",
+      "match": "communication method",
+      "value": "Email"
+    },
+    {
+      "id": "cartao-disponivel",
+      "match": "visa or mastercard|card available for payment",
+      "value": "Yes"
+    },
+    {
+      "id": "fax",
+      "match": "\\bfax\\b",
+      "value": "@skip"
+    },
+    {
+      "id": "outro-texto",
+      "match": "^other \\(please specify\\)",
+      "value": "@skip"
+    },
+    {
+      "id": "deportacao-detalhes",
+      "match": "character:(deporteddate|countrydropdownlist)",
+      "value": "@skip",
+      "_note": "07/10: so os campos de DETALHE (data e pais) da deportacao, pelo name real. A pergunta principal fica com visto-recusado (No)."
+    },
+    {
+      "id": "tb-portador-passaporte",
+      "match": "passport holder of a country not considered low risk",
+      "value": "@skip",
+      "_note": "07/10: pergunta de acompanhamento, texto completo nao lido. VOCE responde."
+    },
+    {
+      "id": "requisitos-esquema",
+      "match": "meet the specific requirements for the scheme",
+      "value": "Yes",
+      "_note": "07/10: default No gerou \"You do not meet the requirements for the Working Holiday Scheme\". So Yes se voce cumpre os requisitos do esquema Brasil."
+    },
+    {
+      "id": "sobrenome",
+      "match": "family name|surname|last name",
+      "value": "{{personal.familyName}}",
+      "force": true,
+      "_note": "07/10: o INZ pre-preenche com o nome da CONTA ('Lima'). Tem que ser IGUAL AO PASSAPORTE -> force sobrescreve."
+    },
+    {
+      "id": "nome-2",
+      "match": "given name.?2|second given name|middle name",
+      "value": "{{personal.givenName2}}"
+    },
+    {
+      "id": "nome-3",
+      "match": "given name.?3|third given name",
+      "value": "{{personal.givenName3}}"
+    },
+    {
+      "id": "nome",
+      "match": "given name|first name|forename",
+      "value": "{{personal.givenNames}}"
+    },
+    {
+      "id": "nome-preferido",
+      "match": "preferred name|known as",
+      "value": "{{personal.preferredName}}"
+    },
+    {
+      "id": "outros-nomes",
+      "match": "other name|name change|changed your name|previously known",
+      "value": "{{personal.knownByOtherNames}}"
+    },
+    {
+      "id": "sexo",
+      "match": "\\bsex\\b|gender",
+      "value": "{{personal.sex}}"
+    },
+    {
+      "id": "nascimento-data",
+      "match": "date of birth|birth date|\\bdob\\b",
+      "value": "{{personal.dateOfBirth}}"
+    },
+    {
+      "id": "nascimento-cidade",
+      "match": "(town|city|place).{0,20}birth|birth.{0,20}(town|city|place)",
+      "value": "{{personal.cityOfBirth}}"
+    },
+    {
+      "id": "nascimento-pais",
+      "match": "country of birth|birth.{0,10}country",
+      "value": "{{personal.countryOfBirth}}"
+    },
+    {
+      "id": "estado-civil",
+      "match": "relationship status|marital status",
+      "value": "{{personal.relationshipStatus}}"
+    },
+    {
+      "id": "passaporte-numero",
+      "match": "passport.{0,15}number|number.{0,10}passport",
+      "value": "{{passport.number}}"
+    },
+    {
+      "id": "passaporte-pais",
+      "match": "passport.{0,25}(country|issued in)|country.{0,15}passport|issuing country",
+      "value": "{{passport.country}}"
+    },
+    {
+      "id": "passaporte-nacionalidade",
+      "match": "nationality.{0,25}passport|passport.{0,25}nationality",
+      "value": "{{passport.nationality}}"
+    },
+    {
+      "id": "passaporte-emissao",
+      "match": "passport.{0,25}(date of )?issue|issue date",
+      "not": "identity|licence|license|card",
+      "value": "{{passport.dateOfIssue}}"
+    },
+    {
+      "id": "passaporte-validade",
+      "match": "passport.{0,25}expir",
+      "value": "{{passport.dateOfExpiry}}"
+    },
+    {
+      "id": "passaporte-local",
+      "match": "place of issue|issued at",
+      "not": "identity|licence|card",
+      "value": "{{passport.placeOfIssue}}"
+    },
+    {
+      "id": "id2-tipo",
+      "match": "(second|another|other).{0,20}(form of )?(id|identification|identity)|type of identification",
+      "kind": "select",
+      "value": "{{secondId.type}}"
+    },
+    {
+      "id": "id2-numero",
+      "match": "(identity|identification|national id|id document).{0,20}number",
+      "value": "{{secondId.number}}"
+    },
+    {
+      "id": "id2-pais",
+      "match": "(identity|identification|id document).{0,25}country",
+      "value": "{{secondId.country}}"
+    },
+    {
+      "id": "id2-emissao",
+      "match": "(identity|identification|id document).{0,25}issue|date document was issued|document.{0,20}issued",
+      "value": "{{secondId.dateOfIssue}}"
+    },
+    {
+      "id": "id2-validade",
+      "match": "(identity|identification|id document).{0,25}expir|expiry date of document|document.{0,25}expir",
+      "value": "{{secondId.dateOfExpiry}}"
+    },
+    {
+      "id": "nacionalidade",
+      "match": "nationality|citizen of|citizenship",
+      "not": "dual|another country|any other",
+      "value": "{{personal.nationality}}"
+    },
+    {
+      "id": "cidadao-outro-pais",
+      "match": "citizen of any other|dual citizen|another citizenship",
+      "value": "No"
+    },
+    {
+      "id": "email",
+      "match": "e-?mail",
+      "value": "{{contact.email}}"
+    },
+    {
+      "id": "celular",
+      "match": "mobile|cell ?phone",
+      "value": "{{contact.mobile}}"
+    },
+    {
+      "id": "telefone",
+      "match": "phone|telephone|contact number",
+      "value": "{{contact.phone}}"
+    },
+    {
+      "id": "endereco-1",
+      "match": "address line ?1|street address|^address$|residential address",
+      "not": "email|country|city|postcode|post code",
+      "value": "{{contact.addressLine1}}"
+    },
+    {
+      "id": "endereco-2",
+      "match": "address line ?2",
+      "value": "{{contact.addressLine2}}"
+    },
+    {
+      "id": "bairro",
+      "match": "suburb",
+      "value": "{{contact.suburb}}"
+    },
+    {
+      "id": "cidade",
+      "match": "\\bcity\\b|town",
+      "not": "birth",
+      "value": "{{contact.city}}"
+    },
+    {
+      "id": "estado",
+      "match": "\\bstate\\b|province|region",
+      "not": "united states|statement",
+      "value": "{{contact.state}}"
+    },
+    {
+      "id": "cep",
+      "match": "post ?code|zip",
+      "value": "{{contact.postcode}}"
+    },
+    {
+      "id": "pais-residencia",
+      "match": "country",
+      "not": "birth|passport|identity|citizen|institution|new zealand|deport|removed|convicted|refused|excluded|character|deport",
+      "value": "{{contact.country}}"
+    },
+    {
+      "id": "ocupacao-cargo",
+      "match": "occupation|job title|position",
+      "not": "industry|intend",
+      "value": "{{occupation.jobTitle}}"
+    },
+    {
+      "id": "ocupacao-industria",
+      "match": "industry|sector|field of work",
+      "kind": "select",
+      "value": "{{occupation.industry}}"
+    },
+    {
+      "id": "chegada",
+      "match": "intend.{0,30}(arriv|travel|enter)|arrival date|date of arrival|when.{0,20}travel to new zealand",
+      "value": "{{trip.intendedArrivalDate}}"
+    },
+    {
+      "id": "fundos-valor",
+      "match": "amount of (funds|money)|how much (money|funds)",
+      "value": "{{trip.fundsNZD}}"
+    },
+    {
+      "id": "fundos-tem",
+      "match": "4,?200|sufficient (funds|money)|enough (funds|money)|access to funds|maintenance funds",
+      "value": "Yes"
+    },
+    {
+      "id": "seguro",
+      "match": "insurance",
+      "value": "Yes"
+    },
+    {
+      "id": "passagem",
+      "match": "onward|return ticket|ticket out of new zealand|leave new zealand|funds to (buy|purchase)",
+      "value": "Yes"
+    },
+    {
+      "id": "passaporte-valido-3m",
+      "match": "passport.{0,40}valid",
+      "value": "Yes"
+    },
+    {
+      "id": "consultor",
+      "match": "immigration adviser|licensed adviser|agent acting",
+      "value": "{{adviser.usingImmigrationAdviser}}"
+    },
+    {
+      "id": "paga-cartao",
+      "match": "pay.{0,25}(credit|debit) card|payment method|paying online",
+      "value": "Yes"
+    },
+    {
+      "id": "whv-anterior",
+      "match": "working holiday.{0,40}(before|previously|granted)|previously.{0,25}working holiday",
+      "value": "{{previousNz.hasHadNzWorkingHolidayVisa}}"
+    },
+    {
+      "id": "esteve-nz",
+      "match": "been to new zealand|travelled to new zealand|held a (new zealand )?visa",
+      "value": "{{previousNz.hasBeenToNz}}"
+    },
+    {
+      "id": "visto-recusado",
+      "match": "refused|declined|deported|removed from",
+      "value": "{{previousNz.hasBeenRefusedVisa}}"
+    },
+    {
+      "id": "tuberculose-diagnostico",
+      "match": "(had|have|diagnosed with|treatment for|suffered from).{0,25}(tuberculosis|\\btb\\b)|(tuberculosis|\\btb\\b).{0,25}(diagnos|treatment)",
+      "value": "No",
+      "_note": "VERDADE: nunca teve TB. NAO confundir com a pergunta de ter morado em pais de risco."
+    },
+    {
+      "id": "tuberculose-residencia",
+      "match": "(spent|lived|resided|stayed).{0,220}(tuberculosis|\\btb\\b)|low risk for (tb|tuberculosis)|countries where (tuberculosis|\\btb\\b)|(tuberculosis|\\btb\\b) is common",
+      "value": "Yes",
+      "_note": "07/10 tela real: \"In the five years prior..., have you spent (lived in and/or visited) a combined total of 3 months in any country NOT considered low risk for TB\". Brasil NAO e baixo risco -> Yes (verdade: mora no Brasil). Vai pedir raio-X depois - esperado.",
+      "not": "passport holder of a country"
+    },
+    {
+      "id": "tuberculose-pais",
+      "match": "which countr|countries.{0,30}(lived|spent|stayed)",
+      "value": "{{health.tbCountry}}"
+    },
+    {
+      "id": "intencao-genuina",
+      "match": "genuine|main purpose|primarily.{0,20}(holiday|travel)|intend to (leave|comply|abide)",
+      "value": "Yes"
+    },
+    {
+      "id": "declaracao",
+      "match": "declar|i agree|i confirm|read and underst|terms and conditions|privacy",
+      "value": "Yes"
+    },
+    {
+      "id": "educacao-qualificacao",
+      "match": "qualification",
+      "kind": "select",
+      "value": "{{education.qualification}}"
+    },
+    {
+      "id": "educacao-curso",
+      "match": "course name|programme|study name",
+      "value": "{{education.courseName}}"
+    },
+    {
+      "id": "educacao-instituicao",
+      "match": "institution|university|school name",
+      "value": "{{education.institutionName}}"
+    }
   ]
 }

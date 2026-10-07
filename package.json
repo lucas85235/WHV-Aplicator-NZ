@@ -26,7 +26,8 @@
     "secrets": "node scripts/set-login.mjs",
     "probe": "tsc && node dist/src/index.js probe",
     "assist": "tsc && node dist/src/index.js assist",
-    "assist-test": "tsc && node scripts/assist-test.mjs"
+    "assist-test": "tsc && node scripts/assist-test.mjs",
+    "diad-test": "tsc && node scripts/diad-test.mjs"
   },
   "dependencies": {
     "node-notifier": "^10.0.1",

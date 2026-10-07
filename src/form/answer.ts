@@ -12,7 +12,10 @@ export function toAscii(s: string): string {
 
 /** Texto contra o qual as regras do livro de respostas sao testadas. */
 export function haystack(f: ScannedField): string {
-  return `${f.question} | ${f.label} | ${f.name} | ${f.selector}`.replace(/\s+/g, " ").trim();
+  // 07/10: todo name do INZ comeca com "_ctl0:ContentPlaceHolder1:". O "Place" casava a
+  // regra de cidade de nascimento ("place...birth") e o "Country of birth" ficou vazio.
+  const name = f.name.replace(/_?ctl\d+[:$_]?|ContentPlaceHolder\d*[:$_]?/gi, " ");
+  return `${f.question} | ${f.label} | ${name} | ${f.selector}`.replace(/\s+/g, " ").trim();
 }
 
 const YESNO = /^(yes|no|sim|nao|true|false)$/i;
@@ -28,6 +31,7 @@ export interface Resolution {
   field: ScannedField;
   value: string | null; // null = sem resposta
   ruleId: string; // id da regra, "default:yesNo", "" se nenhuma
+  force?: boolean;
 }
 
 /** Casa cada campo com a 1a regra do livro. Ordem do JSON = prioridade. */
@@ -49,7 +53,10 @@ export function resolveFields(fields: ScannedField[], book: AnswerBook): Resolut
       // generica (ex: "country" -> "Brazil") sequestra uma pergunta de carater
       // ("removed from any country?") e responde lixo numa pergunta seria.
       if (yesNoField && c.rule.value !== SKIP && !YESNO.test(c.rule.value.trim())) continue;
-      return { field: f, value: c.rule.value === SKIP ? null : c.rule.value, ruleId: c.rule.id };
+      // E o inverso: "Yes"/"No" nunca vai pra campo de texto/data. (07/10: o bot escreveu
+      // "No" na DATA de deportacao e no campo de texto "Any other names".)
+      if (!yesNoField && ["text", "date", "textarea"].includes(f.kind) && YESNO.test(c.rule.value.trim())) continue;
+      return { field: f, value: c.rule.value === SKIP ? null : c.rule.value, ruleId: c.rule.id, force: c.rule.force === true };
     }
     if (book.defaults.yesNo && isYesNoGroup(f)) {
       return { field: f, value: book.defaults.yesNo, ruleId: "default:yesNo" };

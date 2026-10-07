@@ -119,7 +119,21 @@ export async function scanPage(page: Page): Promise<PageSnapshot> {
 
     const fields: ScannedField[] = [];
     const seenRadioGroup = new Set<string>();
-    const inputs = [...document.querySelectorAll("input, select, textarea")].filter(vis);
+    // select2 (visto no INZ em 07/10): o <select> real fica OCULTO e o widget mostra
+    // "Select an Option" + uma caixa de busca. Digitar na busca nao seleciona nada.
+    const isWidgetInput = (el: Element): boolean => {
+      const id = (el as HTMLElement).id || "";
+      return /^s2id_autogen/.test(id) || !!el.closest(".select2-container, .select2-drop, .select2-search, .chosen-container");
+    };
+    const isSelect2Native = (el: Element): boolean => {
+      if (el.tagName !== "SELECT") return false;
+      const id = (el as HTMLElement).id;
+      const w = (id && document.getElementById(`s2id_${id}`)) || el.previousElementSibling;
+      return !!w && /select2-container|chosen-container/.test((w as HTMLElement).className || "") && vis(w);
+    };
+    const inputs = [...document.querySelectorAll("input, select, textarea")].filter(
+      (el) => !isWidgetInput(el) && (vis(el) || isSelect2Native(el)),
+    );
 
     for (const el of inputs) {
       const tagName = el.tagName.toLowerCase();

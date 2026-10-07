@@ -29,6 +29,15 @@ export interface BatchResult {
 const TRUTHY = /^(yes|y|true|1|check|checked|sim)$/i;
 
 const MESES = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+const MESES_EN = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** Datepicker do INZ (visto em 07/10): dateFormat "d MM, yy" -> "28 February, 2034". */
+export function inzDate(v: string): string {
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(v.trim());
+  if (!m) return toAscii(v);
+  const mes = MESES_EN[Number(m[2]) - 1];
+  return mes ? `${Number(m[1])} ${mes}, ${m[3]}` : toAscii(v);
+}
 
 /**
  * Data DD/MM/YYYY num campo que e UM dos 3 dropdowns (dia/mes/ano). Os 3 tem o
@@ -59,7 +68,9 @@ export function toBatch(res: Resolution[], onlyIfEmpty: boolean): { items: Batch
     const f = r.field;
     if (r.value == null) continue;
     if (f.kind === "file") continue; // upload nao da pra fazer por DOM
-    if (onlyIfEmpty && f.value && f.kind !== "checkbox") continue;
+    // data no formato antigo DD/MM/YYYY (que o proprio bot escreveu antes) conta como vazia
+    const dataVelha = f.kind === "date" && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(f.value);
+    if (onlyIfEmpty && f.value && f.kind !== "checkbox" && !dataVelha && !r.force) continue;
 
     let value = r.value;
     if (f.kind === "select" || f.kind === "radio") {
@@ -82,6 +93,8 @@ export function toBatch(res: Resolution[], onlyIfEmpty: boolean): { items: Batch
     } else if (f.kind === "checkbox") {
       value = TRUTHY.test(r.value) ? "1" : "0";
       if ((value === "1") === (f.value === "checked")) continue; // ja no estado certo
+    } else if (f.kind === "date") {
+      value = inzDate(r.value);
     } else {
       value = toAscii(r.value);
     }

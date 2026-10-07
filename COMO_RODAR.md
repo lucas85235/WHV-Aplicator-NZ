@@ -1,20 +1,19 @@
 # Como rodar o bot (WHV Nova Zelândia)
 
-## ⚡ HOJE (07/10) — modo co-piloto
+## ⚡ HOJE (07/10) — co-piloto com entrada automática
 
-Teste Peru (30/09) mostrou: **captcha antes do formulário** e **painel sem botão de aplicar previsível**.
-O `live` automático NÃO é confiável. Use o `assist`:
+1. **Agora:** no Chrome do bot, vá em *Working Holiday Schemes* → **BRAZIL** (página "There is no scheme open").
+2. **Agora:** `Ctrl+C` em qualquer assist antigo → `npm run assist`. Deixa rodando.
+   - até 16:58 ele só atualiza a página a cada ~4 min (mantém a sessão viva)
+   - 16:58:00–16:59:40 a cada ~2,5s · **16:59:40–17:02 a cada ~1,2s**
+   - quando aparecer *Scheme is available* **na página do Brasil** → clica APPLY NOW + alarme + push
+3. **Captcha → você.** O alarme para sozinho quando você passa dele.
+4. **Bot preenche cada tela e aperta Next.** Se você **clicar, rolar ou digitar** numa tela, ela vira sua: o bot não escreve nem avança nela. Você clica Next, ele volta a ajudar na próxima.
+5. **Confira:** sobrenome = passaporte · TB 5 anos = **Yes** · requisitos do esquema = **Yes** · saúde/caráter verdadeiros. A pergunta *"If you are a passport holder of a country NOT considered low risk for TB…"* é sua.
+6. **Declaração + Submit → você.** Pagamento: bot preenche o cartão, você confere, paga e faz o OTP.
 
-1. **16:30** — `npm run open` (terminal 1). Loga no INZ nesse Chrome.
-2. **16:45** — `npm run assist` (terminal 2). Deixa rodando.
-3. **17:00** — **você** atualiza o painel e entra na aplicação (Edit no rascunho ou nova).
-4. **Captcha → você resolve.** O bot espera e não clica em nada nele.
-5. **Bot preenche cada tela na hora e avança sozinho** (~200ms por tela).
-   Se aparecer `CAMPOS SEM RESPOSTA` ou `ERRO DE VALIDACAO` no terminal → completa você e clica Next; ele segue na próxima.
-6. **Declaração → você** revisa, marca e clica **Submit**. O bot nunca faz isso.
-7. **Pagamento → bot preenche o cartão + alarme.** Você confere, paga, faz o OTP.
-
-Testado ponta-a-ponta em portal simulado: `npm run assist-test` (18/18).
+Nunca clica Apply Now de outro país. Nunca marca declaração, nunca submete, nunca paga.
+Ensaio completo simulado: `npm run diad-test` (20/20).
 
 ---
 

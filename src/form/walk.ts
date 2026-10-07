@@ -1,6 +1,6 @@
 import type { Page } from "playwright";
 import type { AppConfig } from "../types.js";
-import { scanPage, type PageSnapshot } from "./scan.js";
+import { scanPage, type PageSnapshot, type ScannedField } from "./scan.js";
 import { resolveFields, applyValue, haystack } from "./answer.js";
 import { toBatch, fastApply, applyFiles } from "./fastfill.js";
 import { settle, waitForChange, pageSig, fastClick, fastClickLink, armNavigation } from "./wait.js";
@@ -25,7 +25,8 @@ const LOGIN_SCREEN = /sign in|log ?in to your account|forgotten your password/i;
 // Pagamento so e reconhecido por CAMPO DE CARTAO ou host de gateway - NUNCA por
 // texto solto. A secao Personal do INZ pergunta "are you paying by credit card?":
 // casar por texto fazia o bot declarar "cheguei no pagamento" na 1a tela e abortar.
-const CARD_FIELD = /card ?number|card ?holder|cardholder|\bcvv\b|\bcvc\b|security code|expiry/i;
+// 07/10: 'expiry' solto casava 'passportExpiryDate' (tela de identificacao) -> alarme falso.
+const CARD_FIELD = /card ?number|card ?holder|cardholder|name on (the )?card|\bcvv\b|\bcvc\b|card security|card expiry/i;
 const GATEWAY_URL = /windcave|paymentexpress|dpspayment|\/payment|checkout/i;
 const SUBMITTED =
   /your application (has been )?(successfully )?(submitted|received)|thank you for (your )?(application|payment)|payment (was )?successful|transaction (approved|successful)/i;
@@ -43,8 +44,9 @@ export function classify(s: PageSnapshot): WalkOutcome | null {
   const hay = `${s.heading} ${s.text}`;
   if (CAPTCHA.test(s.url) || CAPTCHA.test(hay)) return "captcha";
   // campo de cartao de verdade (texto livre nao conta) OU host de gateway
-  const temCampoCartao = s.fields.some((f) => f.kind !== "radio" && CARD_FIELD.test(haystack(f)));
-  if (temCampoCartao || GATEWAY_URL.test(s.url)) return "payment";
+  // so rotulo/pergunta: o name/id do ASP.NET tem 'Expiry', 'Card' etc. em campos que nao sao de cartao
+  const camposCartao = s.fields.filter((f) => f.kind !== "radio" && CARD_FIELD.test(`${f.label} ${f.question}`)).length;
+  if (camposCartao >= 2 || GATEWAY_URL.test(s.url)) return "payment";
   if (SUBMITTED.test(hay)) return "submitted";
   if (QUOTA_CLOSED.test(hay)) return "closed";
   if (s.fields.some((f) => /password/i.test(haystack(f))) && LOGIN_SCREEN.test(hay)) return "loggedout";
@@ -56,10 +58,21 @@ export function classify(s: PageSnapshot): WalkOutcome | null {
  * re-varre pra pegar os campos que so aparecem depois (postback/reveal).
  * Retorna a ultima varredura, pra quem chamou saber o que sobrou.
  */
+/** Freios pro bot nao brigar com o humano (assist). */
+export interface FillGuard {
+  /** Campo que o bot NAO deve tocar (ex: ja escreveu uma vez). */
+  skip?: (f: ScannedField) => boolean;
+  /** Avisado de cada campo que o bot escreveu. */
+  onWritten?: (f: ScannedField) => void;
+  /** true = humano assumiu a tela -> para de escrever. Checado entre passadas. */
+  stop?: () => Promise<boolean>;
+}
+
 export async function fillCurrentPage(
   page: Page,
   cfg: AppConfig,
   first: PageSnapshot,
+  guard: FillGuard = {},
 ): Promise<{ filled: number; unanswered: string[]; snap: PageSnapshot; passes: number }> {
   const fl = cfg.runtime.flow;
   const onlyIfEmpty = fl.fillOnlyEmpty;
@@ -68,7 +81,9 @@ export async function fillCurrentPage(
   let pass = 0;
 
   while (pass < fl.maxFillPasses) {
-    const res = resolveFields(snap.fields, cfg.answers);
+    if (pass > 0 && guard.stop && (await guard.stop())) break;
+    const todas = resolveFields(snap.fields, cfg.answers);
+    const res = guard.skip ? todas.filter((r) => !guard.skip!(r.field)) : todas;
 
     if (fl.fillMode === "fast") {
       const { items, problems } = toBatch(res, onlyIfEmpty);
@@ -79,6 +94,12 @@ export async function fillCurrentPage(
 
       const out = await fastApply(page, items);
       filled += out.applied;
+      if (guard.onWritten) {
+        for (const it of items) {
+          const r = res.find((x) => x.field.selector === it.sel || x.field.optionSelectors.includes(it.sel));
+          if (r) guard.onWritten(r.field);
+        }
+      }
       for (const p of out.problems) log.warn({ detalhe: p }, "lote: falha");
       log.info({ passada: pass + 1, escritos: out.applied, itens: items.length }, "lote aplicado");
 
@@ -97,6 +118,7 @@ export async function fillCurrentPage(
         if (out.ok) {
           did += 1;
           filled += 1;
+          guard.onWritten?.(r.field);
         } else if (!/^ja /.test(out.why)) {
           log.warn({ regra: r.ruleId, campo: haystack(r.field).slice(0, 80), motivo: out.why }, "NAO preencheu");
         }

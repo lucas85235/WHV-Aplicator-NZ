@@ -216,6 +216,43 @@ casos.push({
   ok: msPostback < 3000,
 });
 
+// ---- regressoes da TELA REAL do INZ (07/10), com os textos e names exatos ----
+const campoReal = (kind, question, name, options = []) => ({
+  kind, question, label: question, name, options, value: "", required: false,
+  selector: "[data-whv=x]", optionSelectors: options.map((_, i) => `[data-whv=x-${i}]`),
+});
+const YN = ["", "No", "Yes"];
+const reais = [
+  ["Country of birth (ContentPlaceHolder nao pode casar 'place...birth')",
+    campoReal("select", "Country of birth", "_ctl0:ContentPlaceHolder1:personDetails:CountryDropDownList", ["", "Brazil", "Peru"]), "Brazil"],
+  ["TB: 5 anos em pais NAO baixo risco -> Yes",
+    campoReal("select", "In the five years prior to this application, have you spent (lived in and/or visited) a combined total of 3 months in any country or countries NOT considered to be low risk for TB .", "_ctl0:ContentPlaceHolder1:medicalConditions:tbRiskDropDownList", YN), "Yes"],
+  ["TB ativa -> No",
+    campoReal("select", "Do you have active tuberculosis (TB)?", "_ctl0:ContentPlaceHolder1:medicalConditions:tuberculosisDropDownList", YN), "No"],
+  ["requisitos do esquema -> Yes",
+    campoReal("select", "Do you meet the specific requirements for the scheme you are applying for?", "_ctl0:ContentPlaceHolder1:offshoreDetails:requirementsQuestions:readRequirements", YN), "Yes"],
+  ["data da deportacao fica VAZIA (nao 'No')",
+    campoReal("date", "Date", "_ctl0:ContentPlaceHolder1:character:deportedDateDatePicker_DatePicker"), null],
+  ["pais da deportacao fica VAZIO (nao 'Brazil')",
+    campoReal("select", "Country", "_ctl0:ContentPlaceHolder1:character:countryDropDownList", ["", "Brazil"]), null],
+  ["'Any other names' (texto) fica VAZIO",
+    campoReal("text", "Any other names you are or have ever been known by.", "_ctl0:ContentPlaceHolder1:personDetails:otherNamesTextBox"), null],
+  ["pergunta PRINCIPAL de deportacao -> No (nao pode virar detalhe)",
+    campoReal("select", "Have you ever been deported from any country, excluding New Zealand?", "_ctl0:ContentPlaceHolder1:character:deportedDropDownList", YN), "No"],
+  ["pais do endereco continua Brazil",
+    campoReal("select", "Country", "_ctl0:ContentPlaceHolder1:addressDetails:CountryDropDownList", ["", "Brazil"]), "Brazil"],
+];
+for (const [nome, campo, esperado] of reais) {
+  const r = resolveFields([campo], cfg.answers)[0];
+  casos.push({ nome: `REAL: ${nome}`, esperado: String(esperado), got: `${r.value} (${r.ruleId || "sem regra"})`, ok: r.value === esperado });
+}
+// trava de esquema: texto real da tela de Identificacao do rascunho belga
+const reEsq = /Citizenship of Passport\s*([A-Za-z][A-Za-z .,'&()-]{1,40}?)\s*(Passport Expiry|Passport Number|Second Form|$)/i;
+const belga = reEsq.exec("Please re-enter your passport numbers. Citizenship of Passport Belgium Passport Expiry Date Second Form");
+casos.push({ nome: "REAL: trava de esquema le 'Belgium'", esperado: "Belgium", got: String(belga?.[1]), ok: belga?.[1] === "Belgium" });
+const br = reEsq.exec("Citizenship of Passport Brazil Passport Expiry Date");
+casos.push({ nome: "REAL: trava de esquema aceita 'Brazil'", esperado: "Brazil", got: String(br?.[1]), ok: /brazil/i.test(br?.[1] ?? "") });
+
 // Clique num botao que nao faz nada: tem que devolver rapido, nao esperar o teto.
 await page.setContent(`<h1>Form</h1><input id="x"><button id="b">Save</button>`);
 const sigParado = await pageSig(page);
